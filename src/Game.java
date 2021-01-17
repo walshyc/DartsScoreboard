@@ -10,6 +10,8 @@ public class Game {
 }
 
 class PlayDarts extends JFrame {
+    // initalise match
+    Match match;
 
     PlayDarts() {
         // array for choice of number of legs to play
@@ -18,8 +20,10 @@ class PlayDarts extends JFrame {
         // array for choice of starting score in each leg
         String[] scoreOptions = { "201", "301", "401", "501" };
         // JOptionPane to store players names
-        String playerOneName = JOptionPane.showInputDialog("Player 1 Name");
-        String playerTwoName = JOptionPane.showInputDialog("Player 2 Name");
+        String playerOneName = JOptionPane.showInputDialog(null, "Player 1 Name", "Player 1",
+                JOptionPane.INFORMATION_MESSAGE);
+        String playerTwoName = JOptionPane.showInputDialog(null, "Player 2 Name", "Player 2",
+                JOptionPane.INFORMATION_MESSAGE);
 
         // store the number of legs the user wants to play
         int legs = 1 + JOptionPane.showOptionDialog(null, "How many legs do you want to play?", "Legs",
@@ -39,8 +43,6 @@ class PlayDarts extends JFrame {
         int whoGoesFirst = JOptionPane.showOptionDialog(null, "Which player will throw first?", "Who Throws First?",
                 JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, throwFirstOptions, 0);
 
-        // initalise match
-        Match match;
         // check which player should throw first and set the match up
         // using Player objects, starting score and legs
         if (whoGoesFirst == 0) {
@@ -215,265 +217,120 @@ class PlayDarts extends JFrame {
         // display the frame
         this.setVisible(true);
 
-        // some variables to avoid repitition
-        String onlyNumbers = "You can only enter Numbers!";
-        String notPoss = " is not possible!";
-        String bust = "Bust! Better luck next time!";
-
         // listen for the user pressing enter on their keyboard while on the text field
         // for player 1
         playerOneTextField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // clear any message label text
-                messageLabel.setText("");
-                // try catch block to prevent user entering anything other than numbers
-                try {
-                    // store the value in the text field
-                    int score = Integer.parseInt(playerOneTextField.getText());
-                    // check if the current player should be sumbitting
-                    if (match.onTheOche == match.playerOne) {
-                        // checking if the score is a valid darts score
-                        if (!match.playerOne.isScoreValid(score))
-                            messageLabel.setText(score + notPoss);
-
-                        if (match.playerOne.score - score <= 1)
-                            messageLabel.setText(bust);
-                        // adds the user score to the game
-                        match.throwDarts(match.onTheOche, score);
-                    }
-                    // checks if the leg is over and sets the UI up for the next leg
-                    if (match.legOver()) {
-                        messageLabel.setText("");
-                        playerTwoScore.setText("" + match.playerTwo.getScore());
-                        playerTwoLegs.setText("" + match.playerTwo.getLegsWon());
-                        playerTwoAverage.setText("" + match.playerTwo.getAverage());
-                        messageLabel
-                                .setText("Leg " + (match.currentLeg - 1) + " winner is: " + match.playerOne.getName());
-                        legLabel.setText("Leg " + match.getCurrentLeg());
-                    }
-                    // updates player 1's stats after they have thrown
-                    playerOneScore.setText("" + match.playerOne.getScore());
-                    playerOneLegs.setText("" + match.playerOne.getLegsWon());
-                    playerOneAverage.setText("" + match.playerOne.getAverage());
-                    playerOneHighest.setText("" + match.playerOne.searchLargest());
-
-                    // checks if the match is over and sets the UI for the end of game if so
-                    if (match.matchOver()) {
-                        legLabel.setText("");
-                        playerTwoSubmit.setEnabled(false);
-                        playerTwoSubmit.setBackground(new Color(241, 250, 238));
-                        atTheOcheLabel.setText("Game Over!");
-                        messageLabel.setText(match.getWinner());
-                    } else {
-                        // sets the UI up for player 2 to throw
-                        atTheOcheLabel.setText(match.playerTwo.getName() + "'s turn" + " --->");
-                        playerTwoSubmit.setBackground(new Color(29, 53, 87));
-                        playerTwoSubmit.setEnabled(true);
-                        playerTwoTextField.requestFocusInWindow();
-                    }
-                    // clears player 1's text field and disables the submit button
-                    playerOneTextField.setText("");
-                    playerOneSubmit.setEnabled(false);
-                    playerOneSubmit.setBackground(new Color(241, 250, 238));
-                } catch (Exception z) {
-                    // displays a message if the user enters anything other than numbers
-                    messageLabel.setText(onlyNumbers);
-                    playerOneTextField.setText("");
-                    playerOneTextField.requestFocusInWindow();
-                }
-
+                updateScore(match.playerOne, match.playerTwo, messageLabel, legLabel, atTheOcheLabel,
+                        playerOneTextField, playerOneScore, playerOneLegs, playerOneAverage, playerOneHighest,
+                        playerOneSubmit, playerTwoTextField, playerTwoScore, playerTwoLegs, playerTwoAverage,
+                        playerTwoHighest, playerTwoSubmit);
             }
         });
 
         playerOneSubmit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // clear any message label text
-                messageLabel.setText("");
-                // try catch block to prevent user entering anything other than numbers
-                try {
-                    // store the value in the text field
-                    int score = Integer.parseInt(playerOneTextField.getText());
-                    // check if the current player should be sumbitting
-                    if (match.onTheOche == match.playerOne) {
-                        // checking if the score is a valid darts score
-                        if (!match.playerOne.isScoreValid(score))
-                            messageLabel.setText(score + notPoss);
-
-                        if (match.playerOne.score - score <= 1)
-                            messageLabel.setText(bust);
-                        // adds the user score to the game
-                        match.throwDarts(match.onTheOche, score);
-                    }
-                    // checks if the leg is over and sets the UI up for the next leg
-                    if (match.legOver()) {
-                        messageLabel.setText("");
-                        playerTwoScore.setText("" + match.playerTwo.getScore());
-                        playerTwoLegs.setText("" + match.playerTwo.getLegsWon());
-                        playerTwoAverage.setText("" + match.playerTwo.getAverage());
-                        messageLabel
-                                .setText("Leg " + (match.currentLeg - 1) + " winner is: " + match.playerOne.getName());
-                        legLabel.setText("Leg " + match.getCurrentLeg());
-                    }
-                    // updates player 1's stats after they have thrown
-                    playerOneScore.setText("" + match.playerOne.getScore());
-                    playerOneLegs.setText("" + match.playerOne.getLegsWon());
-                    playerOneAverage.setText("" + match.playerOne.getAverage());
-                    playerOneHighest.setText("" + match.playerOne.searchLargest());
-
-                    // checks if the match is over and sets the UI for the end of game if so
-                    if (match.matchOver()) {
-                        legLabel.setText("");
-                        playerTwoSubmit.setEnabled(false);
-                        playerTwoSubmit.setBackground(new Color(241, 250, 238));
-                        atTheOcheLabel.setText("Game Over!");
-                        messageLabel.setText(match.getWinner());
-                    } else {
-                        // sets the UI up for player 2 to throw
-                        atTheOcheLabel.setText(match.playerTwo.getName() + "'s turn" + " --->");
-                        playerTwoSubmit.setBackground(new Color(29, 53, 87));
-                        playerTwoSubmit.setEnabled(true);
-                        playerTwoTextField.requestFocusInWindow();
-                    }
-                    // clears player 1's text field and disables the submit button
-                    playerOneTextField.setText("");
-                    playerOneSubmit.setEnabled(false);
-                    playerOneSubmit.setBackground(new Color(241, 250, 238));
-                } catch (Exception z) {
-                    // displays a message if the user enters anything other than numbers
-                    messageLabel.setText(onlyNumbers);
-                    playerOneTextField.setText("");
-                    playerOneTextField.requestFocusInWindow();
-                }
-
+                updateScore(match.playerOne, match.playerTwo, messageLabel, legLabel, atTheOcheLabel,
+                        playerOneTextField, playerOneScore, playerOneLegs, playerOneAverage, playerOneHighest,
+                        playerOneSubmit, playerTwoTextField, playerTwoScore, playerTwoLegs, playerTwoAverage,
+                        playerTwoHighest, playerTwoSubmit);
             }
         });
         // listen for the user pressing enter on their keyboard while on the text field
         // for player 2
         playerTwoTextField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // clear any message label text
-                messageLabel.setText("");
-                // try catch block to prevent user entering anything other than numbers
-                try {
-                    // store the value in the text field
-                    int score = Integer.parseInt(playerTwoTextField.getText());
-                    // check if the current player should be sumbitting
-                    if (match.onTheOche == match.playerTwo) {
-                        // checking if the score is a valid darts score
-                        if (!match.playerTwo.isScoreValid(score))
-                            messageLabel.setText(score + notPoss);
-
-                        if (match.playerTwo.score - score <= 1)
-                            messageLabel.setText(bust);
-                        // adds the user score to the game
-                        match.throwDarts(match.onTheOche, score);
-                    }
-                    // checks if the leg is over and sets the UI up for the next leg
-                    if (match.legOver()) {
-                        messageLabel.setText("");
-                        playerOneScore.setText("" + match.playerOne.getScore());
-                        playerOneLegs.setText("" + match.playerOne.getLegsWon());
-                        playerOneAverage.setText("" + match.playerOne.getAverage());
-                        messageLabel
-                                .setText("Leg " + (match.currentLeg - 1) + " winner is: " + match.playerTwo.getName());
-                        legLabel.setText("Leg " + match.getCurrentLeg());
-                    }
-                    // updates player 2's stats after they have thrown
-                    playerTwoScore.setText("" + match.playerTwo.getScore());
-                    playerTwoLegs.setText("" + match.playerTwo.getLegsWon());
-                    playerTwoAverage.setText("" + match.playerTwo.getAverage());
-                    playerTwoHighest.setText("" + match.playerTwo.searchLargest());
-
-                    // checks if the match is over and sets the UI for the end of game if so
-                    if (match.matchOver()) {
-                        legLabel.setText("");
-                        playerOneSubmit.setEnabled(false);
-                        playerOneSubmit.setBackground(new Color(241, 250, 238));
-                        atTheOcheLabel.setText("Game Over!");
-                        messageLabel.setText(match.getWinner());
-                    } else {
-                        // sets the UI up for player 1 to throw
-                        atTheOcheLabel.setText("<--- " + match.playerOne.getName() + "'s turn");
-                        playerOneSubmit.setBackground(new Color(29, 53, 87));
-                        playerOneSubmit.setEnabled(true);
-                        playerOneTextField.requestFocusInWindow();
-                    }
-                    // clears player 2's text field and disables the submit button
-                    playerTwoTextField.setText("");
-                    playerTwoSubmit.setEnabled(false);
-                    playerTwoSubmit.setBackground(new Color(241, 250, 238));
-                } catch (Exception z) {
-                    // displays a message if the user enters anything other than numbers
-                    messageLabel.setText(onlyNumbers);
-                    playerTwoTextField.setText("");
-                    playerTwoTextField.requestFocusInWindow();
-                }
-
+                updateScore(match.playerTwo, match.playerOne, messageLabel, legLabel, atTheOcheLabel,
+                        playerTwoTextField, playerTwoScore, playerTwoLegs, playerTwoAverage, playerTwoHighest,
+                        playerTwoSubmit, playerOneTextField, playerOneScore, playerOneLegs, playerOneAverage,
+                        playerOneHighest, playerOneSubmit);
             }
         });
 
         playerTwoSubmit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // clear any message label text
-                messageLabel.setText("");
-                // try catch block to prevent user entering anything other than numbers
-                try {
-                    // store the value in the text field
-                    int score = Integer.parseInt(playerTwoTextField.getText());
-                    // check if the current player should be sumbitting
-                    if (match.onTheOche == match.playerTwo) {
-                        // checking if the score is a valid darts score
-                        if (!match.playerTwo.isScoreValid(score))
-                            messageLabel.setText(score + notPoss);
-
-                        if (match.playerTwo.score - score <= 1)
-                            messageLabel.setText(bust);
-                        // adds the user score to the game
-                        match.throwDarts(match.onTheOche, score);
-                    }
-                    // checks if the leg is over and sets the UI up for the next leg
-                    if (match.legOver()) {
-                        messageLabel.setText("");
-                        playerOneScore.setText("" + match.playerOne.getScore());
-                        playerOneLegs.setText("" + match.playerOne.getLegsWon());
-                        playerOneAverage.setText("" + match.playerOne.getAverage());
-                        messageLabel
-                                .setText("Leg " + (match.currentLeg - 1) + " winner is: " + match.playerTwo.getName());
-                        legLabel.setText("Leg " + match.getCurrentLeg());
-                    }
-                    // updates player 2's stats after they have thrown
-                    playerTwoScore.setText("" + match.playerTwo.getScore());
-                    playerTwoLegs.setText("" + match.playerTwo.getLegsWon());
-                    playerTwoAverage.setText("" + match.playerTwo.getAverage());
-                    playerTwoHighest.setText("" + match.playerTwo.searchLargest());
-
-                    // checks if the match is over and sets the UI for the end of game if so
-                    if (match.matchOver()) {
-                        legLabel.setText("");
-                        playerOneSubmit.setEnabled(false);
-                        playerOneSubmit.setBackground(new Color(241, 250, 238));
-                        atTheOcheLabel.setText("Game Over!");
-                        messageLabel.setText(match.getWinner());
-                    } else {
-                        // sets the UI up for player 1 to throw
-                        atTheOcheLabel.setText("<--- " + match.playerOne.getName() + "'s turn");
-                        playerOneSubmit.setBackground(new Color(29, 53, 87));
-                        playerOneSubmit.setEnabled(true);
-                        playerOneTextField.requestFocusInWindow();
-                    }
-                    // clears player 2's text field and disables the submit button
-                    playerTwoTextField.setText("");
-                    playerTwoSubmit.setEnabled(false);
-                    playerTwoSubmit.setBackground(new Color(241, 250, 238));
-                } catch (Exception z) {
-                    // displays a message if the user enters anything other than numbers
-                    messageLabel.setText(onlyNumbers);
-                    playerTwoTextField.setText("");
-                    playerTwoTextField.requestFocusInWindow();
-                }
-
+                updateScore(match.playerTwo, match.playerOne, messageLabel, legLabel, atTheOcheLabel,
+                        playerTwoTextField, playerTwoScore, playerTwoLegs, playerTwoAverage, playerTwoHighest,
+                        playerTwoSubmit, playerOneTextField, playerOneScore, playerOneLegs, playerOneAverage,
+                        playerOneHighest, playerOneSubmit);
             }
         });
+    }
+
+    // method that is used to update the UI when a player submits their score
+    public void updateScore(Player playerThrowing, Player otherPlayer, JLabel messageLabel, JLabel legLabel,
+            JLabel ocheLabel, JTextField throwingTextField, JLabel throwingScore, JLabel throwingLegs,
+            JLabel throwingAverage, JLabel throwingHighest, JButton throwingButton, JTextField otherTextField,
+            JLabel otherScore, JLabel otherLegs, JLabel otherAverage, JLabel otherHighest, JButton otherButton) {
+        // clear any message label text
+        messageLabel.setText("");
+        // try catch block to prevent user entering anything other than numbers
+        try {
+            // store the value in the text field
+            int score = Integer.parseInt(throwingTextField.getText());
+            // check if the current player should be sumbitting
+            if (match.onTheOche == playerThrowing) {
+                // checking if the score is a valid darts score
+                if (playerThrowing.score - score <= 1)
+                    messageLabel.setText("Bust! Better luck next time! " + otherPlayer.getName() + "'s turn.");
+                else if (!playerThrowing.isScoreValid(score))
+                    messageLabel.setText(score + " is not possible! " + otherPlayer.getName() + "'s turn.");
+                // adds the user score to the game
+                match.throwDarts(match.onTheOche, score);
+            }
+            // checks if the leg is over and sets the UI up for the next leg
+            if (match.legOver()) {
+                messageLabel.setText("");
+                otherScore.setText("" + otherPlayer.getScore());
+                otherLegs.setText("" + otherPlayer.getLegsWon());
+                otherAverage.setText("" + otherPlayer.getAverage());
+                messageLabel.setText("Leg " + (match.currentLeg - 1) + " winner is: " + playerThrowing.getName());
+                legLabel.setText("Leg " + match.getCurrentLeg());
+            }
+            // updates the throwing player's stats after they have thrown
+            updatePlayer(playerThrowing, throwingScore, throwingLegs, throwingAverage, throwingHighest);
+
+            // checks if the match is over and sets the UI for the end of game if so
+            if (match.matchOver()) {
+                legLabel.setText("");
+                otherButton.setEnabled(false);
+                otherButton.setBackground(new Color(241, 250, 238));
+                ocheLabel.setText("Game Over!");
+                messageLabel.setText(match.getWinner());
+            } else {
+                // sets the UI up for the next player to throw
+                if (playerThrowing == match.playerOne)
+                    ocheLabel.setText(otherPlayer.getName() + "'s turn " + "--->");
+                else
+                    ocheLabel.setText("<--- " + otherPlayer.getName() + "'s turn");
+                otherButton.setBackground(new Color(29, 53, 87));
+                otherButton.setEnabled(true);
+                otherTextField.requestFocusInWindow();
+            }
+            // clears the throwing players text field and disables the submit button
+            setUpNextPlayer(throwingTextField, throwingButton);
+        } catch (Exception z) {
+            // displays a message if the user enters anything other than numbers
+            messageLabel.setText("You can only enter Numbers!");
+            throwingTextField.setText("");
+            throwingTextField.requestFocusInWindow();
+        }
+
+    }
+
+    // method to update the current players data
+    public void updatePlayer(Player player, JLabel score, JLabel legs, JLabel average, JLabel highest) {
+        score.setText("" + player.getScore());
+        legs.setText("" + player.getLegsWon());
+        average.setText("" + player.getAverage());
+        highest.setText("" + player.searchLargest());
+    }
+
+    // method to set the UI up for the next player
+    public void setUpNextPlayer(JTextField textField, JButton button) {
+        textField.setText("");
+        button.setEnabled(false);
+        button.setBackground(new Color(241, 250, 238));
     }
 }
 
@@ -556,7 +413,6 @@ class Match {
         } else {
             return this.playerTwo.name + " Wins!";
         }
-
     }
 }
 
@@ -651,7 +507,6 @@ class Player {
         // calucations to update the players average
         this.attempts += 1;
         this.average = (this.totalScored * 1.0) / this.attempts;
-
     }
 
     // method to search the linked list to find the players highest single score
@@ -672,11 +527,9 @@ class Player {
         // returns largest value found or else 0
         return largest;
     }
-
-    // create a single link/node for the linked list
-
 }
 
+// create a single link/node for the linked list
 class Link {
     public int data;
     public Link next;
@@ -704,11 +557,9 @@ class DartsLinkedList {
     // method that takes an index and returns the link at the given index
     public int get(int index) {
         Link check = this.head;
-
         for (int i = 0; i < index; i++) {
             check = check.next;
         }
-
         return check.data;
 
     }
@@ -735,7 +586,6 @@ class DartsLinkedList {
             while (currentLink.next != null) {
                 currentLink = currentLink.next;
             }
-
             currentLink.next = newLink;
         }
     }
